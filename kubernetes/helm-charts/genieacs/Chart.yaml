@@ -1,0 +1,19 @@
+apiVersion: v2
+name: genieacs
+version: 1.0.0
+description: A Helm umbrella chart for GenieACS
+type: application
+
+dependencies:
+  - name: ui
+    version: 1.0.0
+    repository: file://ui
+  - name: fs
+    version: 1.0.0
+    repository: file://fs
+  - name: nbi
+    version: 1.0.0
+    repository: file://nbi
+  - name: cwmp
+    version: 1.0.0
+    repository: file://cwmp

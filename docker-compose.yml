@@ -1,0 +1,105 @@
+# GenieACS docker-compose.yml
+
+services:
+  cwmp:
+    build:
+      context: .
+      dockerfile: docker/cwmp/Dockerfile
+    container_name: genieacs-cwmp
+    restart: always
+    networks:
+      - genieacs
+    depends_on:
+      - mongodb
+    environment:
+      - GENIEACS_CWMP_ACCESS_LOG_FILE=./logs/genieacs-cwmp-access.log
+      - GENIEACS_DEBUG_FILE=./logs/genieacs-debug.yaml
+      - GENIEACS_EXT_DIR=./genieacs/genieacs/ext
+      - GENIEACS_EXT_TIMEOUT=15000
+      - GENIEACS_MAX_COMMIT_ITERATIONS=10000
+      - GENIEACS_CWMP_ALIVE_TIMEOUT=1200
+      - GENIEACS_CWMP_INTERFACE="::"
+      - GENIEACS_MAX_CONCURRENT_REQUESTS=20000
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://genieacs:genieacs@mongodb:27017/
+    
+  fs:
+    build:
+      context: .
+      dockerfile: docker/fs/Dockerfile
+    container_name: genieacs-fs
+    restart: always
+    networks:
+      - genieacs
+    depends_on:
+      - mongodb
+    environment:
+      - GENIEACS_FS_ACCESS_LOG_FILE=./logs/genieacs-fs-access.log
+      - GENIEACS_DEBUG_FILE=./logs/genieacs-debug.yaml
+      - GENIEACS_EXT_DIR=./genieacs/genieacs/ext
+      - GENIEACS_EXT_TIMEOUT=15000
+      - GENIEACS_MAX_COMMIT_ITERATIONS=10000
+      - GENIEACS_FS_INTERFACE=0.0.0.0
+      - GENIEACS_MAX_CONCURRENT_REQUESTS=20000
+      - GENIEACS_FS_HOSTNAME=127.0.0.1
+      - GENIEACS_FS_LOG_FILE=./logs/genieacs-fs.log
+      - GENIEACS_FS_MONGODB_CONNECTION_URL=mongodb://genieacs:genieacs@mongodb:27017/
+
+  nbi:
+    build:
+      context: .
+      dockerfile: docker/nbi/Dockerfile
+    container_name: genieacs-nbi
+    restart: always
+    networks:
+      - genieacs
+    depends_on:
+      - mongodb
+    environment:
+      - GENIEACS_NBI_ACCESS_LOG_FILE=./logs/genieacs-nbi-access.log
+      - GENIEACS_DEBUG_FILE=./logs/genieacs-debug.yaml
+      - GENIEACS_EXT_DIR=./genieacs/genieacs/ext
+      - GENIEACS_EXT_TIMEOUT=15000
+      - GENIEACS_MAX_COMMIT_ITERATIONS=10000
+      - GENIEACS_MAX_CONCURRENT_REQUESTS=20000
+      - GENIEACS_NBI_WORKER_PROCESSES=1
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://genieacs:genieacs@mongodb:27017/
+
+  ui:
+    build:
+      context: .
+      dockerfile: docker/ui/Dockerfile
+    container_name: genieacs-ui
+    restart: always
+    networks:
+      - genieacs
+    depends_on:
+      - mongodb
+    environment:
+      - GENIEACS_UI_ACCESS_LOG_FILE=./logs/genieacs-ui-access.log
+      - GENIEACS_DEBUG_FILE=./logs/genieacs-debug.yaml
+      - GENIEACS_EXT_DIR=./genieacs/genieacs/ext
+      - GENIEACS_UI_JWT_SECRET=genieacssecret
+      - GENIEACS_EXT_TIMEOUT=15000
+      - GENIEACS_MAX_COMMIT_ITERATIONS=10000
+      - GENIEACS_UI_INTERFACE="::"
+      - GENIEACS_MAX_CONCURRENT_REQUESTS=20000
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://genieacs:genieacs@mongodb:27017/
+
+  mongodb:
+    image: mongo:5
+    container_name: genieacs-mongodb
+    restart: always
+    networks:
+      - genieacs
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=genieacs
+      - MONGO_INITDB_ROOT_PASSWORD=genieacs
+      - MONGO_INITDB_DATABASE=genieacs
+    volumes:
+      - mongodb-data:/data/db
+
+networks:
+  genieacs:
+
+volumes:
+  mongodb-data:
